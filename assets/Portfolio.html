@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Portfolio</title>
+    <link rel="stylesheet" href="css/scratch.css">
+</head>
+<body>
+         <div class="navbar">
+            <a href="proff.html">Home</a>
+        </div>
+    <br>
+
+    <h1>My Portfolio</h1>
+    <br>
+
+    <div class="description">
+        <h3>
+        <p>I'm a filmmaker (<a href="#videos">Watch Films Now</a>), photographer, and designer passionate about capturing stories that connect and inspire. From short films and brand videos to portrait and sports photography, I bring creativity </p>
+        <p> and purpose to every project. My work ranges from powerful storytelling pieces like a short film exploring mental health to high-energy content for brands like Bailey's Blossoms and the Upstream Gaming Podcast.</p>
+        <p>Whether behind the camera or in the editing room, I'm always chasing the perfect balance of emotion and artistry — bringing ideas to life in a way that feels authentic and unforgettable.</p>
+        </h3>
+        <h2>What I Do</h2>
+        <ol>
+         <li>Filmmaking
+             <ul>
+                <li>Short films</li>
+                <li>Brand videos</li>
+            </ul>
+        </li>
+        <li>Photography
+            <ul>
+                <li>Portraits</li>
+                <li>Sports</li>
+            </ul>
+            </li>
+        </ol>
+    </div>
+    <br>
+    <div>
+        <h2>Photography</h2>
+
+
+    </div>
+
+    <div class="vid1" id="videos">
+        <h2>I'll Be Fine | Short Film</h2>
+        <br>
+        <iframe
+            width="560"
+            height="315"
+            src="https://www.youtube.com/embed/XWxyXayWr6A"
+            title="I'll Be Fine | Short Film"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allowfullscreen></iframe>
+    </div>
+    <br>
+
+    <div class="vid1">
+        <h2>Texan Blood | Short Film</h2>
+        <iframe
+            width="560"
+            height="315"
+            src="https://www.youtube.com/embed/-IPmrfJgIDk"
+            title="Texan Blood | Short Film"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allowfullscreen></iframe>
+        <h3>This hype video was made to give the football team recognition for their hard work and to promote the homecoming game where it was presented. (Made alongside Cole Richardson.)</h3>
+    </div>
+
+<div class='tableauPlaceholder' id='viz1781310041909' style='position: relative'><noscript>
+<img 
+        alt='Movie Directors ' 
+        src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Fi&#47;FilmDirectors&#47;MovieDirectors&#47;1_rss.png' 
+        style='border: none' />
+    </a>
+</noscript>
+<object 
+        class='tableauViz'  
+        style='display:none;'>
+        <param 
+        name='host_url' 
+        value='https%3A%2F%2Fpublic.tableau.com%2F' />
+<param 
+        name='embed_code_version' 
+        value='3' /> 
+    <param 
+        name='site_root' 
+        value='' />
+    <param 
+        name='name' 
+        value='FilmDirectors&#47;MovieDirectors' />
+    <param
+        name='tabs'
+        value='no' />
+    <param 
+        name='toolbar'
+        value='yes' />
+    <param 
+        name='static_image' 
+        value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Fi&#47;FilmDirectors&#47;MovieDirectors&#47;1.png' />
+    <param 
+        name='animate_transition' 
+        value='yes' />
+    <param 
+        name='display_static_image' 
+        value='yes' />
+    <param 
+        name='display_spinner' 
+        value='yes' />
+    <param 
+        name='display_overlay' 
+        value='yes' />
+    <param 
+        name='display_count' 
+        value='yes' /><param
+        name='language' 
+        value='en-US' />
+    </object></div>                
+        <script 
+            type='text/javascript'>                    var divElement = document.getElementById('viz1781310041909');                    var vizElement = divElement.getElementsByTagName('object')[0];                    vizElement.style.width='730px';vizElement.style.height='627px';                    var scriptElement = document.createElement('script');                    scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';                    vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>
+
+
+<!-- Code injected by live-server -->
+<script>
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	// ]]>
+</script>
+</body>
+</html>

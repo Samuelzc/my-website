@@ -1,0 +1,72 @@
+html {
+     background-color: #EEEBE0;
+}
+
+body{
+    font-family: Georgia;
+    background-color:  #EEEBE0;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    left: 200px;
+    text-align: center;
+}
+
+h1 {
+    font-family: Georgia;
+    font-weight: bold;
+    color: #262314;
+    position: relative;
+    bottom: 5%;
+}
+
+h2 {
+    font-family: Georgia;
+    color: #282828;
+    font-weight: bold;
+    position: relative;
+    bottom: 5%;
+}
+
+h3 {
+    font-family: Georgia;
+    color: #282828;
+    font-weight: lighter;
+}
+
+.navbar{
+    text-align: left;
+}
+    
+.description {
+    font-family: Georgia;
+    color: #262314;
+    position: relative;
+    margin: 0px;
+}
+.video3{
+    height: 500px;
+    width: 800px;
+}
+.video2{
+    height: 500px;
+    width: 800px;
+}
+.video1{
+    height: 500px;
+    width: 800px;
+}
+.vid1{
+   margin-bottom: 30px;
+}
+
+.tableauPlaceholder{
+    margin: 0 auto;
+}
+
+ol, ul {
+    text-align: left;
+}
+.bubbles{
+    width: 550px;
+}

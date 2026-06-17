@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>JokesAside — Swipe on Jokes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg-top:#F3AD22;
+    --bg-mid:#DC7A1C;
+    --bg-bot:#73300E;
+    --paper:#FFF8EC;
+    --paper-2:#FCEED4;
+    --text:#3A2412;
+    --muted:#A98A66;
+    --ember-1:#FF5A1F;
+    --ember-2:#FFA62B;
+    --pass-1:#9B7B5E;
+    --pass-2:#BE9E80;
+    --white:#FFF7EE;
+    --glass:rgba(255,255,255,0.16);
+    --glass-strong:rgba(255,255,255,0.26);
+    --glass-brd:rgba(255,255,255,0.42);
+    --display:"Sora",system-ui,sans-serif;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+
+  body{
+    font-family:var(--display);
+    color:var(--white);
+    background:
+      radial-gradient(120% 70% at 50% 0%, rgba(255,221,150,0.45) 0%, transparent 55%),
+      linear-gradient(178deg,var(--bg-top) 0%, var(--bg-mid) 46%, var(--bg-bot) 100%);
+    background-attachment:fixed;
+    min-height:100dvh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:space-between;
+    overflow:hidden;
+    padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+  }
+
+  /* ---------- Header ---------- */
+  header{
+    width:100%;
+    max-width:440px;
+    padding:30px 30px 6px;
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+  }
+  .brand h1{
+    font-size:38px;
+    line-height:0.92;
+    font-weight:800;
+    letter-spacing:-0.03em;
+    text-transform:uppercase;
+    color:var(--white);
+    text-shadow:0 2px 18px rgba(120,50,0,0.25);
+  }
+  .brand h1 span{display:block;color:rgba(255,255,255,0.62);}
+  .brand .tag{
+    display:block;
+    margin-top:11px;
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:0.26em;
+    color:rgba(255,255,255,0.7);
+    font-weight:500;
+  }
+  .score{
+    display:flex;align-items:center;gap:7px;
+    background:var(--glass);
+    border:1px solid var(--glass-brd);
+    -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+    padding:8px 14px 8px 12px;
+    border-radius:100px;
+    font-size:14px;font-weight:600;color:var(--white);
+    flex:none;
+  }
+  .score svg{display:block;}
+  .score .num{min-width:14px;text-align:center;font-variant-numeric:tabular-nums;}
+
+  /* ---------- Deck ---------- */
+  .stage{
+    position:relative;
+    width:100%;
+    max-width:440px;
+    flex:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:4px 24px;
+  }
+  .deck{
+    position:relative;
+    width:100%;
+    max-width:344px;
+    aspect-ratio:3/4.05;
+  }
+
+  .card{
+    position:absolute;
+    inset:0;
+    background:linear-gradient(168deg,var(--paper) 0%, var(--paper-2) 100%);
+    border-radius:30px;
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.55) inset,
+      0 40px 80px -30px rgba(60,18,0,0.6),
+      0 0 78px -8px rgba(255,201,128,0.5);
+    color:var(--text);
+    padding:30px 30px 26px;
+    display:flex;
+    flex-direction:column;
+    cursor:grab;
+    will-change:transform;
+    user-select:none;
+    touch-action:none;
+    overflow:hidden;
+  }
+  .card:active{cursor:grabbing;}
+  .card::after{
+    content:"";
+    position:absolute;inset:0;
+    background:radial-gradient(130% 80% at 50% -8%, rgba(255,255,255,0.5) 0%, transparent 42%);
+    pointer-events:none;
+  }
+
+  .card .top{
+    display:flex;align-items:center;justify-content:space-between;
+    color:var(--muted);
+  }
+  .card .deck-name{
+    font-size:11px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;
+  }
+  .card .idx{
+    font-size:11px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:0.05em;
+  }
+
+  .card .joke{flex:1;display:flex;align-items:center;}
+  .card .joke p{
+    font-weight:500;
+    font-size:clamp(21px,6vw,27px);
+    line-height:1.3;
+    letter-spacing:-0.015em;
+    color:var(--text);
+  }
+
+  .card .foot{
+    display:flex;align-items:center;gap:8px;
+    color:var(--muted);font-size:12px;font-weight:500;
+  }
+  .card .foot .dot{width:6px;height:6px;border-radius:50%;background:var(--ember-1);flex:none;}
+  .card .foot span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+  /* swipe stamps */
+  .stamp{
+    position:absolute;top:26px;
+    font-family:var(--display);
+    font-weight:700;
+    font-size:28px;
+    letter-spacing:0.04em;
+    padding:6px 16px;
+    border-radius:14px;
+    border:4px solid;
+    opacity:0;
+    pointer-events:none;
+    text-transform:uppercase;
+  }
+  .stamp.like{left:22px;transform:rotate(-15deg);color:var(--ember-1);border-color:var(--ember-1);}
+  .stamp.nope{right:22px;transform:rotate(15deg);color:var(--pass-1);border-color:var(--pass-1);}
+
+  /* ---------- Prompt card (your turn) ---------- */
+  .card.prompt{
+    background:linear-gradient(168deg,#FFF6E6 0%, #FCE6C9 100%);
+    cursor:default;
+    touch-action:auto;
+  }
+  .card.prompt .deck-name{color:var(--ember-1);}
+  .prompt-body{flex:1;display:flex;flex-direction:column;justify-content:center;gap:16px;}
+  .prompt-title{
+    font-weight:700;
+    font-size:clamp(24px,6.4vw,30px);line-height:1.12;
+    color:var(--text);letter-spacing:-0.02em;text-transform:uppercase;
+  }
+  .prompt-input{
+    width:100%;font-family:var(--display);font-size:16px;font-weight:500;
+    color:var(--text);background:#fff;
+    border:1.5px solid #ECD9BF;border-radius:16px;
+    padding:14px 16px;outline:none;
+    transition:border-color .15s ease, box-shadow .15s ease;
+  }
+  .prompt-input::placeholder{color:#BBA383;}
+  .prompt-input:focus{border-color:var(--ember-1);box-shadow:0 0 0 3px rgba(255,90,31,0.16);}
+  .prompt-actions{display:flex;gap:10px;align-items:center;}
+  .prompt-go{
+    flex:1;font-family:var(--display);font-weight:600;font-size:15px;
+    color:#fff;background:linear-gradient(120deg,var(--ember-1),var(--ember-2));
+    border:none;border-radius:100px;padding:14px 18px;cursor:pointer;
+    box-shadow:0 12px 26px -10px rgba(255,90,31,0.75);
+    transition:transform .12s ease, opacity .15s ease;
+  }
+  .prompt-go:active{transform:scale(0.96);}
+  .prompt-go:disabled{opacity:0.5;cursor:default;}
+  .prompt-go:focus-visible,.prompt-skip:focus-visible{outline:3px solid var(--ember-1);outline-offset:2px;}
+  .prompt-skip{
+    font-family:var(--display);font-weight:600;font-size:14px;color:var(--muted);
+    background:transparent;border:none;border-radius:100px;padding:14px;cursor:pointer;
+  }
+  .prompt-skip:hover{color:var(--text);}
+
+  .loader{display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center;color:var(--muted);}
+  .loader p{font-size:15px;line-height:1.5;font-weight:500;}
+  .loader p b{color:var(--text);font-weight:600;}
+  .spinner{
+    width:34px;height:34px;border-radius:50%;
+    border:3px solid rgba(255,90,31,0.22);border-top-color:var(--ember-1);
+    animation:spin .7s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  .card.shake{animation:shake .4s ease;}
+  @keyframes shake{
+    0%,100%{transform:translateX(0);}
+    20%{transform:translateX(-8px);}
+    40%{transform:translateX(8px);}
+    60%{transform:translateX(-5px);}
+    80%{transform:translateX(5px);}
+  }
+
+  /* ---------- Controls ---------- */
+  .controls{
+    width:100%;
+    max-width:440px;
+    padding:16px 30px 32px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:22px;
+  }
+  .btn{
+    border:none;
+    cursor:pointer;
+    border-radius:50%;
+    display:grid;place-items:center;
+    color:var(--white);
+    background:var(--glass);
+    border:1px solid var(--glass-brd);
+    -webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);
+    transition:transform .14s ease, background .18s ease, box-shadow .18s ease, opacity .18s ease;
+  }
+  .btn:active{transform:scale(0.9);}
+  .btn:disabled{opacity:0.34;cursor:not-allowed;}
+  .btn.pass{width:64px;height:64px;}
+  .btn.rewind{width:50px;height:50px;}
+  .btn.like{
+    width:70px;height:70px;
+    background:linear-gradient(140deg,var(--ember-1),var(--ember-2));
+    border:1px solid rgba(255,255,255,0.35);
+    box-shadow:0 14px 30px -10px rgba(255,90,31,0.7);
+  }
+  .btn.pass:hover:not(:disabled){background:var(--glass-strong);box-shadow:0 12px 26px -12px rgba(80,40,10,0.6);}
+  .btn.rewind:hover:not(:disabled){background:var(--glass-strong);}
+  .btn.like:hover:not(:disabled){box-shadow:0 16px 34px -10px rgba(255,90,31,0.85);}
+  .btn svg{display:block;}
+  .btn:focus-visible{outline:3px solid var(--white);outline-offset:3px;}
+
+  .hint{
+    text-align:center;
+    color:rgba(255,255,255,0.78);
+    font-size:11px;
+    letter-spacing:0.06em;
+    padding:0 28px 8px;
+    min-height:14px;
+  }
+  .hint b{color:#fff;font-weight:600;}
+
+  /* ---------- End screen ---------- */
+  .end{
+    position:absolute;
+    inset:0;
+    display:none;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:30px;
+  }
+  .end.show{display:flex;}
+  .end .eyebrow{
+    font-size:11px;letter-spacing:0.26em;text-transform:uppercase;color:rgba(255,255,255,0.72);font-weight:600;margin-bottom:10px;
+  }
+  .end h2{
+    font-weight:800;
+    font-size:34px;
+    line-height:1.08;
+    text-transform:uppercase;
+    letter-spacing:-0.02em;
+    max-width:320px;
+    margin-bottom:10px;
+    text-shadow:0 2px 18px rgba(120,50,0,0.25);
+  }
+  .end .verdict{
+    font-size:15px;color:rgba(255,255,255,0.88);max-width:320px;line-height:1.5;margin-bottom:28px;
+  }
+  .end .stats{display:flex;gap:14px;margin-bottom:30px;}
+  .end .stat{
+    background:var(--glass);
+    border:1px solid var(--glass-brd);
+    -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+    border-radius:20px;
+    padding:16px 24px;
+    min-width:96px;
+  }
+  .end .stat .n{font-size:32px;font-weight:700;letter-spacing:-0.03em;font-variant-numeric:tabular-nums;color:var(--white);}
+  .end .stat .l{font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.7);margin-top:4px;}
+  .end .stat.liked .n{color:#FFE0A8;}
+  .replay{
+    font-family:var(--display);
+    font-weight:600;font-size:15px;
+    color:#fff;
+    background:linear-gradient(120deg,var(--ember-1),var(--ember-2));
+    border:none;border-radius:100px;
+    padding:16px 36px;
+    cursor:pointer;
+    box-shadow:0 16px 32px -12px rgba(255,90,31,0.85);
+    transition:transform .14s ease;
+  }
+  .replay:active{transform:scale(0.95);}
+  .replay:focus-visible{outline:3px solid var(--white);outline-offset:3px;}
+
+  @media (max-width:380px){
+    .controls{gap:16px;}
+    header{padding:24px 22px 6px;}
+    .brand h1{font-size:33px;}
+    .stage{padding:2px 18px;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .card,.btn,.replay{transition:none !important;}
+  }
+</style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <h1>Jokes<span>Aside</span></h1>
+      <span class="tag">swipe right if it slaps</span>
+    </div>
+    <div class="score" aria-live="polite" aria-label="Jokes liked">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+        <path d="M12 21s-7.5-4.6-10-9.1C.3 8.9 1.7 5.5 5 5.5c2 0 3.2 1.2 4 2.4.8-1.2 2-2.4 4-2.4 3.3 0 4.7 3.4 3 6.4C19.5 16.4 12 21 12 21z" fill="#FF5A1F"/>
+      </svg>
+      <span class="num" id="likeCount">0</span>
+    </div>
+  </header>
+
+  <div class="stage">
+    <div class="deck" id="deck" aria-label="Joke cards"></div>
+
+    <div class="end" id="endScreen">
+      <div class="eyebrow">deck empty</div>
+      <h2 id="endTitle">You've judged them all.</h2>
+      <p class="verdict" id="endVerdict"></p>
+      <div class="stats">
+        <div class="stat liked"><div class="n" id="statLiked">0</div><div class="l">Liked</div></div>
+        <div class="stat"><div class="n" id="statPassed">0</div><div class="l">Passed</div></div>
+      </div>
+      <button class="replay" id="replay">Reshuffle the deck</button>
+    </div>
+  </div>
+
+  <p class="hint" id="hint">Drag to judge. Every few cards, you write one.</p>
+
+  <div class="controls">
+    <button class="btn rewind" id="rewindBtn" title="Undo last swipe" aria-label="Undo last swipe" disabled>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 7v6h6"/><path d="M3.5 13a9 9 0 1 0 2.3-9"/>
+      </svg>
+    </button>
+    <button class="btn pass" id="passBtn" title="Pass (left arrow)" aria-label="Pass on this joke">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+        <path d="M6 6l12 12M18 6L6 18"/>
+      </svg>
+    </button>
+    <button class="btn like" id="likeBtn" title="Like (right arrow)" aria-label="Like this joke">
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="#fff">
+        <path d="M12 21s-7.5-4.6-10-9.1C.3 8.9 1.7 5.5 5 5.5c2 0 3.2 1.2 4 2.4.8-1.2 2-2.4 4-2.4 3.3 0 4.7 3.4 3 6.4C19.5 16.4 12 21 12 21z"/>
+      </svg>
+    </button>
+  </div>
+
+<script>
+(function(){
+  "use strict";
+
+  const JOKES = [
+    "I have a stepladder. I never knew my real ladder.",
+    "My therapist says I have a problem with vengeance. We'll see about that.",
+    "I told my wife she was drawing her eyebrows too high. She looked surprised.",
+    "Light travels faster than sound. That's why some people seem bright until they speak.",
+    "I have a fear of speed bumps. But I'm slowly getting over it.",
+    "My grandfather has the heart of a lion \u2014 and a lifetime ban from the zoo.",
+    "Dark humour is like food. Not everyone gets it.",
+    "I was going to tell a time-travel joke, but you didn't like it.",
+    "My doctor told me I'm going deaf. The news was hard for me to hear.",
+    "Two cannibals are eating a clown. One says, \u201cDoes this taste funny to you?\u201d",
+    "Common sense is like deodorant. The people who need it most never use it.",
+    "I have a joke about procrastination, but I'll tell you later.",
+    "Death is the number one killer in the world.",
+    "Knowledge is knowing a tomato is a fruit. Wisdom is not putting it in a fruit salad.",
+    "The past, the present, and the future walked into a bar. It was tense.",
+    "I would tell you a chemistry joke, but I know I wouldn't get a reaction.",
+    "Why don't skeletons fight each other? They don't have the guts.",
+    "I have an inferiority complex, but it's not a very good one.",
+    "My pessimism is just optimism with a few years of experience.",
+    "Apparently you can't use \u201cbeefstew\u201d as a password. It's not stroganoff.",
+    "I childproofed the whole house. Somehow they still get in.",
+    "A book fell on my head the other day. I only have my shelf to blame.",
+    "My boss told me to have a good day. So I went home.",
+    "I named my dog \u201cFive Miles\u201d so I can tell people I walk Five Miles every day.",
+    "I used to play piano by ear. Now I use my hands.",
+    "I'm reading a book on anti-gravity. It's impossible to put down.",
+    "I have a few good years left in me. I keep them in a jar, just in case.",
+    "Honesty is the best policy. Which is why I'm still uninsured.",
+    "I told my computer I needed a break. Now it won't stop sending me KitKats.",
+    "My plan for retirement is to be a problem for the next generation."
+  ];
+
+  const deck = document.getElementById('deck');
+  const endScreen = document.getElementById('endScreen');
+  const likeCountEl = document.getElementById('likeCount');
+  const hint = document.getElementById('hint');
+  const passBtn = document.getElementById('passBtn');
+  const likeBtn = document.getElementById('likeBtn');
+  const rewindBtn = document.getElementById('rewindBtn');
+  const replay = document.getElementById('replay');
+
+  const VISIBLE = 3;            // stacked cards rendered at once
+  const THRESHOLD = 110;        // px drag needed to commit a swipe
+  const PROMPT_EVERY = 3;       // insert a "your turn" card after every N jokes
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  let order = [];               // remaining card items (last element = top card)
+  let liked = 0, passed = 0, total = 0;
+  let history = [];             // for rewind: { item, dir }
+  let busy = false;             // animation lock
+  let inputMode = false;        // true while the top card awaits a typed topic
+
+  function shuffle(arr){
+    const a = arr.slice();
+    for(let i=a.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      const t=a[i]; a[i]=a[j]; a[j]=t;
+    }
+    return a;
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+
+  // Interleave a prompt card after every PROMPT_EVERY jokes.
+  function buildOrder(){
+    const jokes = shuffle(JOKES).map(function(t){ return {type:'joke', text:t}; });
+    const seq = [];
+    let n = 0;
+    jokes.forEach(function(j){
+      seq.push(j);
+      n++;
+      if(n % PROMPT_EVERY === 0){
+        seq.push({type:'prompt', text:null, topic:null, done:false});
+      }
+    });
+    return seq.reverse(); // consumed from the end
+  }
+
+  function start(){
+    order = buildOrder();
+    liked = 0; passed = 0; total = order.length; history = [];
+    busy = false; inputMode = false;
+    likeCountEl.textContent = '0';
+    endScreen.classList.remove('show');
+    rewindBtn.disabled = true;
+    setHint('Drag to judge. Every few cards, you write one.');
+    render();
+  }
+
+  function setHint(t){ hint.innerHTML = t; }
+
+  function label(){
+    const done = total - order.length;
+    return String(Math.min(done+1,total)).padStart(2,'0') + ' / ' + String(total).padStart(2,'0');
+  }
+
+  function jokeCardHTML(text, idxLabel, foot, deckName){
+    return ''+
+      '<div class="top"><span class="deck-name">'+escapeHtml(deckName)+'</span><span class="idx">'+idxLabel+'</span></div>'+
+      '<div class="joke"><p>'+escapeHtml(text)+'</p></div>'+
+      '<div class="foot"><span class="dot"></span><span>'+escapeHtml(foot)+'</span></div>'+
+      '<div class="stamp like">Liked</div>'+
+      '<div class="stamp nope">Pass</div>';
+  }
+
+  function promptCardHTML(idxLabel){
+    return ''+
+      '<div class="top"><span class="deck-name">Your turn</span><span class="idx">'+idxLabel+'</span></div>'+
+      '<div class="prompt-body">'+
+        '<p class="prompt-title">Your turn. Give me a topic to roast.</p>'+
+        '<input class="prompt-input" type="text" maxlength="70" autocomplete="off" '+
+               'placeholder="a topic, a noun, your group chat\u2026" />'+
+        '<div class="prompt-actions">'+
+          '<button class="prompt-go" type="button">Write the joke</button>'+
+          '<button class="prompt-skip" type="button">Skip</button>'+
+        '</div>'+
+      '</div>';
+  }
+
+  function buildCard(item, depth){
+    const card = document.createElement('div');
+    card.className = 'card';
+    card._item = item;
+    const idxLabel = label();
+
+    if(item.type === 'prompt' && !item.done){
+      card.classList.add('prompt');
+      card.innerHTML = promptCardHTML(idxLabel);
+      if(depth > 0){
+        card.querySelectorAll('.prompt-input,.prompt-go,.prompt-skip').forEach(function(el){
+          el.disabled = true; el.tabIndex = -1;
+        });
+      }
+    } else {
+      const isYours = item.type === 'prompt';
+      const deckName = isYours ? 'Your joke' : 'JokesAside';
+      const foot = isYours ? ('inspired by \u201c' + (item.topic || 'your topic') + '\u201d') : 'swipe to judge';
+      card.innerHTML = jokeCardHTML(item.text, idxLabel, foot, deckName);
+    }
+
+    const scale = 1 - depth*0.045;
+    const ty = depth*14;
+    card.style.transform = 'translateY('+ty+'px) scale('+scale+')';
+    card.style.zIndex = String(100 - depth);
+    card.style.opacity = depth >= VISIBLE ? '0' : '1';
+    card.dataset.depth = depth;
+    return card;
+  }
+
+  function render(){
+    deck.innerHTML = '';
+    const top = order.length - 1;
+    const from = Math.max(0, top - (VISIBLE - 1));
+    for(let i = from; i <= top; i++){
+      deck.appendChild(buildCard(order[i], top - i));
+    }
+    if(order.length === 0){
+      passBtn.disabled = true; likeBtn.disabled = true;
+      finish();
+      return;
+    }
+    configureTop(deck.lastElementChild);
+  }
+
+  function configureTop(card){
+    card = card || deck.lastElementChild;
+    if(!card) return;
+    const item = card._item;
+    if(item && item.type === 'prompt' && !item.done){
+      configurePrompt(card, item);
+    } else {
+      inputMode = false;
+      const empty = order.length === 0;
+      passBtn.disabled = empty;
+      likeBtn.disabled = empty;
+      attachDrag(card);
+    }
+  }
+
+  function configurePrompt(card, item){
+    inputMode = true;
+    passBtn.disabled = true;
+    likeBtn.disabled = true;
+    setHint('Your turn \u2014 type a topic and we\u2019ll write the joke.');
+
+    const input = card.querySelector('.prompt-input');
+    const go = card.querySelector('.prompt-go');
+    const skip = card.querySelector('.prompt-skip');
+    [input, go, skip].forEach(function(el){ el.disabled = false; el.removeAttribute('tabindex'); });
+
+    function submit(){
+      const topic = (input.value || '').trim();
+      if(!topic){ shake(card); input.focus(); return; }
+      writeJokeCard(card, item, topic);
+    }
+    go.addEventListener('click', submit);
+    skip.addEventListener('click', function(){ inputMode = false; commit('skip', card); });
+    input.addEventListener('keydown', function(e){
+      e.stopPropagation();
+      if(e.key === 'Enter'){ e.preventDefault(); submit(); }
+    });
+    setTimeout(function(){ try{ input.focus(); }catch(_){} }, 40);
+  }
+
+  function shake(card){
+    card.classList.remove('shake');
+    void card.offsetWidth;
+    card.classList.add('shake');
+    setTimeout(function(){ card.classList.remove('shake'); }, 420);
+  }
+
+  // Write a joke locally from the topic, with a brief "thinking" beat. No network.
+  function writeJokeCard(card, item, topic){
+    inputMode = false;
+    busy = true;
+    passBtn.disabled = true; likeBtn.disabled = true; rewindBtn.disabled = true;
+    setHint('Writing your joke\u2026');
+
+    const body = card.querySelector('.prompt-body');
+    body.innerHTML =
+      '<div class="loader"><span class="spinner"></span>' +
+      '<p>Writing a joke about<br><b>' + escapeHtml(topic) + '</b></p></div>';
+
+    setTimeout(function(){
+      const joke = writeJoke(topic);
+      item.text = joke; item.topic = topic; item.done = true;
+      card.classList.remove('prompt');
+      card.innerHTML = jokeCardHTML(joke, label(), 'inspired by \u201c' + topic + '\u201d', 'Your joke');
+      busy = false;
+      rewindBtn.disabled = history.length === 0;
+      configureTop(card);
+      setHint('Hot off the press \u2014 swipe to judge your own joke.');
+    }, reduceMotion ? 0 : 550);
+  }
+
+  // Local joke writer: slots the topic into a random deadpan one-liner.
+  function writeJoke(topic){
+    var t = String(topic).trim().replace(/[.?!]+$/, '');
+    var T = t.charAt(0).toUpperCase() + t.slice(1);
+    var lines = [
+      "I asked my therapist about " + t + ". Now we both need a therapist.",
+      T + " is proof the universe has a sense of humour \u2014 and the punchline is us.",
+      "My relationship with " + t + " is like my will to live: technically still active.",
+      "I tried to quit " + t + " for my health. " + T + " filed a missing-person report.",
+      T + "? That's in my five-year plan, right next to \u2018survive.\u2019",
+      "Nothing bonds people like " + t + " and the dead silence that follows.",
+      "I'd explain " + t + ", but I'm saving my last brain cell for the funeral.",
+      "I named my anxiety after " + t + " so they'd finally have something in common.",
+      "They said face your fears, so I stared at " + t + " until one of us cracked. It wasn't the fear.",
+      "My doctor said avoid stress, then brought up " + t + ". The audacity.",
+      T + " doesn't get easier. You just develop a better poker face.",
+      "I put " + t + " on my vision board. The board has since filed for emotional damages.",
+      "I gave up on " + t + " the way I give up on everything: gradually, then all at once, then with relief.",
+      "My horoscope just said \u2018" + t + ",\u2019 and honestly, rude but accurate.",
+      "Experts recommend eight hours of sleep. Experts have clearly never met " + t + ".",
+      "I'm not saying " + t + " ruined my life. My life had a head start, but " + t + " is gaining.",
+      T + " is my Roman Empire. I think about it daily and it brings me no peace.",
+      "I treat " + t + " like my smoke alarm: ignore it until it's screaming, then remove the battery.",
+      "They say money can't buy happiness, but it can buy distance from " + t + ", which is close enough.",
+      "My toxic trait is thinking I can handle " + t + " on four hours of sleep and pure spite.",
+      T + " called. I let it go to voicemail, like all my problems.",
+      "On a scale of one to " + t + ", I'm fine \u2014 which means nothing, because that scale is broken.",
+      "I keep " + t + " where I keep all my big feelings: unread, in a drawer, slowly fermenting."
+    ];
+    return lines[Math.floor(Math.random() * lines.length)];
+  }
+
+  function attachDrag(card){
+    let startX=0, startY=0, dx=0, dy=0, dragging=false, pid=null;
+    const likeStamp = card.querySelector('.stamp.like');
+    const nopeStamp = card.querySelector('.stamp.nope');
+    if(!likeStamp || !nopeStamp) return;
+
+    function down(e){
+      if(busy) return;
+      dragging = true;
+      pid = e.pointerId;
+      startX = e.clientX; startY = e.clientY;
+      card.setPointerCapture(pid);
+      card.style.transition = 'none';
+    }
+    function move(e){
+      if(!dragging || e.pointerId !== pid) return;
+      dx = e.clientX - startX;
+      dy = e.clientY - startY;
+      card.style.transform = 'translate('+dx+'px,'+dy+'px) rotate('+(dx*0.06)+'deg)';
+      const p = Math.min(Math.abs(dx)/THRESHOLD, 1);
+      likeStamp.style.opacity = dx > 0 ? p : 0;
+      nopeStamp.style.opacity = dx < 0 ? p : 0;
+    }
+    function up(e){
+      if(!dragging || e.pointerId !== pid) return;
+      dragging = false;
+      try{ card.releasePointerCapture(pid); }catch(_){}
+      if(dx > THRESHOLD)        commit('like', card);
+      else if(dx < -THRESHOLD)  commit('pass', card);
+      else snapBack();
+    }
+    function snapBack(){
+      card.style.transition = reduceMotion ? 'none' : 'transform .32s cubic-bezier(.2,.8,.3,1)';
+      card.style.transform = 'translate(0,0) rotate(0deg)';
+      likeStamp.style.opacity = 0;
+      nopeStamp.style.opacity = 0;
+    }
+
+    card.addEventListener('pointerdown', down);
+    card.addEventListener('pointermove', move);
+    card.addEventListener('pointerup', up);
+    card.addEventListener('pointercancel', up);
+  }
+
+  function flingTop(dir){
+    if(busy || inputMode || order.length === 0) return;
+    const card = deck.lastElementChild;
+    if(!card) return;
+    const item = card._item;
+    if(item && item.type === 'prompt' && !item.done) return;
+    const stamp = card.querySelector(dir === 'like' ? '.stamp.like' : '.stamp.nope');
+    if(stamp) stamp.style.opacity = 1;
+    commit(dir, card);
+  }
+
+  function commit(dir, cardEl){
+    if(busy) return;
+    busy = true;
+    inputMode = false;
+    const card = cardEl || deck.lastElementChild;
+    const item = order.pop();
+    history.push({ item: item, dir: dir });
+    rewindBtn.disabled = false;
+
+    if(dir === 'like'){ liked++; likeCountEl.textContent = String(liked); }
+    else if(dir === 'pass'){ passed++; }
+
+    promoteRemaining();
+
+    const goLeft = dir !== 'like';
+    const offX = goLeft ? -window.innerWidth : window.innerWidth;
+    const rot = goLeft ? -22 : 22;
+    card.style.transition = reduceMotion ? 'none' : 'transform .42s ease, opacity .42s ease';
+    card.style.transform = 'translate('+offX+'px,-40px) rotate('+rot+'deg)';
+    card.style.opacity = '0';
+
+    const cleanup = function(){
+      card.removeEventListener('transitionend', cleanup);
+      if(card.parentNode) card.parentNode.removeChild(card);
+      busy = false;
+      backfill();
+      if(order.length === 0) finish();
+    };
+    if(reduceMotion) cleanup();
+    else card.addEventListener('transitionend', cleanup);
+  }
+
+  function promoteRemaining(){
+    const cards = Array.from(deck.children);
+    const behind = cards.slice(0, cards.length - 1);
+    for(let i=0;i<behind.length;i++){
+      const newDepth = behind.length - 1 - i;
+      const c = behind[i];
+      c.dataset.depth = newDepth;
+      const scale = 1 - newDepth*0.045;
+      const ty = newDepth*14;
+      c.style.transition = reduceMotion ? 'none' : 'transform .42s cubic-bezier(.2,.8,.3,1)';
+      c.style.transform = 'translateY('+ty+'px) scale('+scale+')';
+      c.style.zIndex = String(100 - newDepth);
+      c.style.opacity = '1';
+      if(newDepth === 0){
+        const ls = c.querySelector('.stamp.like'); if(ls) ls.style.opacity = 0;
+        const ns = c.querySelector('.stamp.nope'); if(ns) ns.style.opacity = 0;
+        configureTop(c);
+      }
+    }
+  }
+
+  function backfill(){
+    const visibleCount = deck.children.length;
+    const nextIdx = order.length - 1 - visibleCount;
+    if(nextIdx >= 0){
+      deck.insertBefore(buildCard(order[nextIdx], visibleCount), deck.firstChild);
+    }
+    refreshLabels();
+  }
+
+  function refreshLabels(){
+    const done = total - order.length;
+    const text = String(Math.min(done+1,total)).padStart(2,'0') + ' / ' + String(total).padStart(2,'0');
+    Array.from(deck.children).forEach(function(c){
+      const idx = c.querySelector('.idx');
+      if(idx) idx.textContent = text;
+    });
+  }
+
+  function rewind(){
+    if(busy || inputMode || history.length === 0) return;
+    const last = history.pop();
+    if(last.dir === 'like'){ liked = Math.max(0, liked-1); likeCountEl.textContent = String(liked); }
+    else if(last.dir === 'pass'){ passed = Math.max(0, passed-1); }
+    order.push(last.item);
+    if(history.length === 0) rewindBtn.disabled = true;
+    endScreen.classList.remove('show');
+    render();
+    const top = deck.lastElementChild;
+    if(top && !reduceMotion){
+      const fromX = (last.dir === 'like') ? window.innerWidth : -window.innerWidth;
+      top.style.transition = 'none';
+      top.style.transform = 'translate('+fromX+'px,-40px) rotate(0deg)';
+      requestAnimationFrame(function(){
+        top.style.transition = 'transform .4s cubic-bezier(.2,.8,.3,1)';
+        top.style.transform = 'translateY(0) scale(1)';
+      });
+    }
+  }
+
+  function finish(){
+    const judged = liked + passed;
+    const ratio = judged ? liked/judged : 0;
+    let title, verdict;
+    if(judged === 0){
+      title = "All skips, no stance.";
+      verdict = "You skipped your way through the whole thing. Commitment issues, but make it comedy.";
+    } else if(liked === 0){
+      title = "Tough crowd.";
+      verdict = "You passed on every single one. Your standards are a war crime, and we respect it.";
+    } else if(ratio >= 0.7){
+      title = "Easy to please.";
+      verdict = "You liked most of them. Either the writing slaps or you just enjoy being alive. Both are valid.";
+    } else if(ratio >= 0.35){
+      title = "Discerning palate.";
+      verdict = "A balanced ratio. You know what lands and what flops, and you're not afraid to say so.";
+    } else {
+      title = "Brutal, but fair.";
+      verdict = "You liked a precious few. The ones that survived must have really earned it.";
+    }
+    document.getElementById('endTitle').textContent = title;
+    document.getElementById('endVerdict').textContent = verdict;
+    document.getElementById('statLiked').textContent = String(liked);
+    document.getElementById('statPassed').textContent = String(passed);
+    endScreen.classList.add('show');
+    passBtn.disabled = true; likeBtn.disabled = true;
+    setHint('That\u2019s the whole deck. Reshuffle for a fresh order.');
+  }
+
+  // ---- wiring ----
+  passBtn.addEventListener('click', function(){ flingTop('pass'); });
+  likeBtn.addEventListener('click', function(){ flingTop('like'); });
+  rewindBtn.addEventListener('click', rewind);
+  replay.addEventListener('click', start);
+
+  document.addEventListener('keydown', function(e){
+    if(inputMode) return;
+    if(e.key === 'ArrowLeft'){ flingTop('pass'); }
+    else if(e.key === 'ArrowRight'){ flingTop('like'); }
+    else if(e.key === 'z' || e.key === 'Z' || e.key === 'Backspace'){ rewind(); }
+  });
+
+  start();
+})();
+</script>
+</body>
+</html>
